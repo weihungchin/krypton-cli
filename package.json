@@ -6,7 +6,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/weihungchin/krypton-cli"
   },
   "scripts": {
     "start": "node .",
