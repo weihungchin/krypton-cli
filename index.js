@@ -70,7 +70,7 @@ async function fetchPrice(selected) {
       `https://data.messari.io/api/v1/assets/${selected}/metrics/market-data`
     );
     if (res && res.status == 200) {
-      await handleFetchPriceSuccess(res, spinner);
+      await handleFetchPriceSuccess(res, spinner, selected);
     } else {
       spinner.error({
         text: `☠️ Failed to get data for ${selected}, error: ${res?.status}`,
@@ -97,21 +97,26 @@ async function askCrypto() {
 
   cryptoToSearch = answer.crypto_name;
 }
-async function handleFetchPriceSuccess(response, spinner) {
+async function handleFetchPriceSuccess(response, spinner, selected) {
   const {
     data: {
-      symbol,
-      name,
+      Asset: { symbol, name },
       market_data: { price_usd, percent_change_usd_last_24_hours },
     },
   } = await response.json();
-  const label = `${name} (${symbol})`;
-  const price = ` ${price_usd.toFixed(4)} USD `;
-  spinner.success({
-    text: `${chalk.bold.yellowBright(label)} - ${chalk.inverse(
-      price
-    )} ${formatPriceChange(percent_change_usd_last_24_hours)}`,
-  });
+  const label = name ? `${name} (${symbol})` : `${selected}`;
+  if (price_usd) {
+    const price = `${price_usd.toFixed(4)} USD `;
+    spinner.success({
+      text: `${chalk.bold.yellowBright(label)} - ${chalk.inverse(
+        price
+      )} ${formatPriceChange(percent_change_usd_last_24_hours)}`,
+    });
+  } else {
+    spinner.success({
+      text: `${chalk.bold.yellowBright(selected)} - No Price Found`,
+    });
+  }
 }
 
 function formatPriceChange(priceChange) {
